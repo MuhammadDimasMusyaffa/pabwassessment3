@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Barang</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script>
+    $(document).ready(function() {
+      // Menampilkan data barang menggunakan DataTable
+      $('#barangTable').DataTable({
+        ajax: {
+          url: 'http://localhost:3000/barang',
+          dataSrc: ''
+        },
+        columns: [
+          { data: 'kode_barang' },
+          { data: 'nama_barang' },
+          { data: 'kode_jenis' },
+          { data: 'harga_jual_satuan' },
+          { data: 'jumlah_stok' }
+        ]
+      });
+
+      // Validasi form tambah menggunakan jQuery Validation Plugin
+      $('#tambahForm').validate({
+        rules: {
+          kode_barang: 'required',
+          nama_barang: 'required',
+          kode_jenis: 'required',
+          harga_jual_satuan: 'required',
+          jumlah_stok: 'required'
+        },
+        submitHandler: function(form) {
+          $.ajax({
+            url: '/barang',
+            type: 'POST',
+            data: $(form).serialize(),
+            success: function(response) {
+              alert(response);
+              $('#tambahForm')[0].reset();
+            }
+          });
+        }
+      });
+
+      // Validasi form update menggunakan jQuery Validation Plugin
+      $('#updateForm').validate({
+        rules: {
+          kode_barang: 'required',
+          nama_barang: 'required',
+          kode_jenis: 'required',
+          harga_jual_satuan: 'required',
+          jumlah_stok: 'required'
+        },
+        submitHandler: function(form) {
+          const kode_barang = $('#update_kode_barang').val();
+          $.ajax({
+            url: '/barang/' + kode_barang,
+            type: 'PUT',
+            data: $(form).serialize(),
+            success: function(response) {
+              alert(response);
+            }
+          });
+        }
+      });
+
+      // Mengambil data barang untuk form update
+      $('#update_kode_barang').autocomplete({
+        source: '/barang',
+        select: function(event, ui) {
+          const kode_barang = ui.item.value;
+          $.ajax({
+            url: '/barang/' + kode_barang,
+            type: 'GET',
+            success: function(data) {
+              $('#update_nama_barang').val(data.nama_barang);
+              $('#update_kode_jenis').val(data.kode_jenis);
+              $('#update_harga_jual_satuan').val(data.harga_jual_satuan);
+              $('#update_jumlah_stok').val(data.jumlah_stok);
+            }
+          });
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <h1>Data Barang</h1>
+
+  <!-- Tabel untuk menampilkan data barang menggunakan DataTable -->
+  <table id="barangTable">
+    <thead>
+      <tr>
+        <th>Kode Barang</th>
+        <th>Nama Barang</th>
+        <th>Kode Jenis</th>
+        <th>Harga Jual Satuan</th>
+        <th>Jumlah Stok</th>
+      </tr>
+    </thead>
+  </table>
+
+  <!-- Form tambah data barang -->
+  <h2>Tambah Barang</h2>
+  <form id="tambahForm">
+    <label for="kode_barang">Kode Barang:</label>
+    <input type="text" id="kode_barang" name="kode_barang">
+    <br>
+    <label for="nama_barang">Nama Barang:</label>
+    <input type="text" id="nama_barang" name="nama_barang">
+    <br>
+    <label for="kode_jenis">Kode Jenis:</label>
+    <input type="text" id="kode_jenis" name="kode_jenis">
+    <br>
+    <label for="harga_jual_satuan">Harga Jual Satuan:</label>
+    <input type="text" id="harga_jual_satuan" name="harga_jual_satuan">
+    <br>
+    <label for="jumlah_stok">Jumlah Stok:</label>
+    <input type="text" id="jumlah_stok" name="jumlah_stok">
+    <br>
+    <button type="submit">Tambah</button>
+  </form>
+
+  <!-- Form update data barang -->
+  <h2>Update Barang</h2>
+  <form id="updateForm">
+    <label for="update_kode_barang">Kode Barang:</label>
+    <input type="text" id="update_kode_barang" name="kode_barang">
+    <br>
+    <label for="update_nama_barang">Nama Barang:</label>
+    <input type="text" id="update_nama_barang" name="nama_barang">
+    <br>
+    <label for="update_kode_jenis">Kode Jenis:</label>
+    <input type="text" id="update_kode_jenis" name="kode_jenis">
+    <br>
+    <label for="update_harga_jual_satuan">Harga Jual Satuan:</label>
+    <input type="text" id="update_harga_jual_satuan" name="harga_jual_satuan">
+    <br>
+    <label for="update_jumlah_stok">Jumlah Stok:</label>
+    <input type="text" id="update_jumlah_stok" name="jumlah_stok">
+    <br>
+    <button type="submit">Update</button>
+  </form>
+</body>
+</html>
